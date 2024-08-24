@@ -1,0 +1,66 @@
+import csv
+from datetime import datetime
+
+# File where the expenses will be stored
+FILE_NAME = "expenses.csv"
+
+# Function to load expenses from the CSV file
+def load_expenses():
+    expenses = []
+    try:
+        with open(FILE_NAME, mode='r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                expenses.append(row)
+    except FileNotFoundError:
+        pass
+    return expenses
+
+# Function to save expenses to the CSV file
+def save_expenses(expenses):
+    with open(FILE_NAME, mode='w', newline='') as file:
+        fieldnames = ['Date', 'Amount', 'Category', 'Description']
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(expenses)
+
+# Function to add an expense
+def add_expense():
+    date = input("Enter the date (YYYY-MM-DD): ")
+    amount = input("Enter the amount: ")
+    category = input("Enter the category (e.g., Food, Transport): ")
+    description = input("Enter a description: ")
+
+    expense = {
+        'Date': date,
+        'Amount': amount,
+        'Category': category,
+        'Description': description
+    }
+
+    expenses = load_expenses()
+    expenses.append(expense)
+    save_expenses(expenses)
+    print("Expense added successfully!\n")
+
+# Function to view all expenses
+def view_expenses():
+    expenses = load_expenses()
+    if not expenses:
+        print("No expenses recorded yet.\n")
+    else:
+        for expense in expenses:
+            print(f"Date: {expense['Date']}, Amount: {expense['Amount']}, "
+                  f"Category: {expense['Category']}, Description: {expense['Description']}")
+        print()
+
+# Function to delete an expense
+def delete_expense():
+    view_expenses()
+    expenses = load_expenses()
+    if expenses:
+        index = int(input("Enter the index of the expense to delete: ")) - 1
+        if 0 <= index < len(expenses):
+            expenses.pop(index)
+            save_expenses(expenses)
+            print("Expense deleted successfully!\n")
